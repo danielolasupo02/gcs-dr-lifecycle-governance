@@ -106,19 +106,19 @@ cannot be deleted once created, and key versions only schedule destruction, so
 key names are chosen once and not churned.
 
 ### Commands
-The full command set is in [`scripts/phase-01/`](../../scripts/phase-01/):
+The full command set is in [`scripts/phase-01/`](../scripts/phase-01/):
 
 | Script | What it does |
 |---|---|
-| [`create-project.sh`](../../scripts/phase-01/create-project.sh) | Creates the project with a random four-digit suffix, labels it, links it to an open billing account and sets it as the gcloud default |
-| [`setup_env.sh`](../../scripts/phase-01/setup_env.sh) | Checks tooling, logs in gcloud and ADC, sets project and quota project, checks billing, enables APIs, builds the Python venv |
-| [`apis.txt`](../../scripts/phase-01/apis.txt) | Single list of APIs used across all seven phases |
-| [`create-budget.sh`](../../scripts/phase-01/create-budget.sh) | Creates a $10 project-scoped budget with 50/90/100% alerts; skips if it already exists |
-| [`verify_env.sh`](../../scripts/phase-01/verify_env.sh) | Runs every check in the table below, plus `terraform validate` |
-| [`verify_python_auth.py`](../../scripts/phase-01/verify_python_auth.py) | Proves `google-cloud-storage` authenticates through ADC |
-| [`failure_tests.sh`](../../scripts/phase-01/failure_tests.sh) | Bad project ID, anonymous access and invalid Terraform input, each expected to fail |
+| [`create-project.sh`](../scripts/phase-01/create-project.sh) | Creates the project with a random four-digit suffix, labels it, links it to an open billing account and sets it as the gcloud default |
+| [`setup_env.sh`](../scripts/phase-01/setup_env.sh) | Checks tooling, logs in gcloud and ADC, sets project and quota project, checks billing, enables APIs, builds the Python venv |
+| [`apis.txt`](../scripts/phase-01/apis.txt) | Single list of APIs used across all seven phases |
+| [`create-budget.sh`](../scripts/phase-01/create-budget.sh) | Creates a $10 project-scoped budget with 50/90/100% alerts; skips if it already exists |
+| [`verify_env.sh`](../scripts/phase-01/verify_env.sh) | Runs every check in the table below, plus `terraform validate` |
+| [`verify_python_auth.py`](../scripts/phase-01/verify_python_auth.py) | Proves `google-cloud-storage` authenticates through ADC |
+| [`failure_tests.sh`](../scripts/phase-01/failure_tests.sh) | Bad project ID, anonymous access and invalid Terraform input, each expected to fail |
 
-Terraform for this phase is in [`terraform/phase-01/`](../../terraform/phase-01/).
+Terraform for this phase is in [`terraform/phase-01/`](../terraform/phase-01/).
 
 ## Verification
 
@@ -149,16 +149,16 @@ The four negative tests:
 ### Screenshots
 
 **Enabled APIs**
-![Enabled APIs](../../screenshots/01-enabled-apis.png)
+![Enabled APIs](../screenshots/01-enabled-apis.png)
 
 **Cloud Storage API enabled**
-![Cloud Storage API enabled](../../screenshots/02-storage-api-enabled.png)
+![Cloud Storage API enabled](../screenshots/02-storage-api-enabled.png)
 
 **Environment verification passes**
-![Environment verification passes](../../screenshots/03-verify-env-pass.png)
+![Environment verification passes](../screenshots/03-verify-env-pass.png)
 
 **Failure tests pass**
-![Failure tests pass](../../screenshots/04-failure-tests-pass.png)
+![Failure tests pass](../screenshots/04-failure-tests-pass.png)
 
 | File | Capture | Link |
 |---|---|---|
