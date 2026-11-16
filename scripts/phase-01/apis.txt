@@ -1,0 +1,15 @@
+# APIs required across all 7 phases. Enabled up front so later phases do not stall.
+# Phase 1 (required by brief)
+storage-component.googleapis.com
+storage.googleapis.com
+serviceusage.googleapis.com
+cloudresourcemanager.googleapis.com
+iam.googleapis.com
+# Phase 4: CMEK
+cloudkms.googleapis.com
+# Phase 5: cross-bucket replication runs on Storage Transfer Service
+storagetransfer.googleapis.com
+# Stretch goals: access logs to BigQuery, cost alerting
+logging.googleapis.com
+bigquery.googleapis.com
+monitoring.googleapis.com

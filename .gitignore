@@ -1,0 +1,23 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+terraform.tfvars
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Credentials, never commit these
+*.json.key
+*-sa-key.json
+application_default_credentials.json
+
+# Local logs
+logs/
