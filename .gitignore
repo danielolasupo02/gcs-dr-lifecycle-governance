@@ -21,3 +21,6 @@ application_default_credentials.json
 
 # Local logs
 logs/
+
+# IDE
+.idea/
