@@ -1,0 +1,40 @@
+output "project_id" {
+  value = data.google_project.this.project_id
+}
+
+output "project_number" {
+  value = data.google_project.this.number
+}
+
+output "gcs_service_agent" {
+  description = "Cloud Storage service agent; gets roles/cloudkms.cryptoKeyEncrypterDecrypter in phase 04"
+  value       = "service-${data.google_project.this.number}@gs-project-accounts.iam.gserviceaccount.com"
+}
+
+output "enabled_apis" {
+  value = sort([for s in google_project_service.required : s.service])
+}
+
+output "primary_bucket_name" {
+  value = google_storage_bucket.primary.name
+}
+
+output "primary_bucket_url" {
+  value = google_storage_bucket.primary.url
+}
+
+output "primary_region" {
+  value = lower(google_storage_bucket.primary.location)
+}
+
+output "secondary_bucket_name" {
+  value = google_storage_bucket.secondary.name
+}
+
+output "secondary_bucket_url" {
+  value = google_storage_bucket.secondary.url
+}
+
+output "secondary_region" {
+  value = lower(google_storage_bucket.secondary.location)
+}
