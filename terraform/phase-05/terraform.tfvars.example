@@ -1,0 +1,19 @@
+# Copy to terraform.tfvars (gitignored) and fill in.
+project_id       = "your-project-id"
+region_primary   = "us-central1"
+region_secondary = "us-east1"
+
+# Lifecycle thresholds (transitions use these from phase 03)
+nearline_age_days                 = 30
+coldline_age_days                 = 90
+noncurrent_version_retention_days = 90
+
+# Set to true only right before a deliberate terraform destroy
+force_destroy = false
+
+# Encryption (phase 04)
+kms_rotation_days    = 90
+kms_protection_level = "SOFTWARE"
+
+# Replication (phase 05)
+replication_overwrite_when = "DIFFERENT"
