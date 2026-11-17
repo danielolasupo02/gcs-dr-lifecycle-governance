@@ -170,16 +170,13 @@ script deletes the object straight away.
 **Customer-supplied key and destroy rejected**
 ![Customer-supplied key and destroy rejected](../screenshots/16-failure-tests-pass.png)
 
-| File | Capture | Link |
-|---|---|---|
-| `13-kms-keys-two-regions.png` | Key Management page listing `fintech-archive-ring` in `us-central1` and `us-east1` | https://console.cloud.google.com/security/kms/keyrings?project=fintech-gcs-archive-5449 |
-| `14-primary-bucket-cmek.png` | Primary bucket Configuration tab showing Encryption type: Customer-managed key, with the `archive-primary` key name | https://console.cloud.google.com/storage/browser/fintech-gcs-archive-5449-primary;tab=configuration?project=fintech-gcs-archive-5449 |
-| `15-verify-cmek-pass.png` | Terminal: `verify_cmek.sh` for the primary bucket, including the "probe object encrypted with" line | Terminal |
-| `16-failure-tests-pass.png` | Terminal: `failure_tests.sh` with the T1 CSEK rejection and T2 `prevent_destroy` lines visible | Terminal |
+| File | Capture |
+|---|---|
+| `13-kms-keys-two-regions.png` | Key Management page listing `fintech-archive-ring` in `us-central1` and `us-east1` | 
+| `14-primary-bucket-cmek.png` | Primary bucket Configuration tab showing Encryption type: Customer-managed key, with the `archive-primary` key name | 
+| `15-verify-cmek-pass.png` | Terminal: `verify_cmek.sh` for the primary bucket, including the "probe object encrypted with" line | 
+| `16-failure-tests-pass.png` | Terminal: `failure_tests.sh` with the T1 CSEK rejection and T2 `prevent_destroy` lines visible |
 
-Save each as lowercase `.png`.
-
-## Notes & Issues
 
 <!--
 Record each real problem hit while running this phase, in this shape:
@@ -202,25 +199,18 @@ Record each real problem hit while running this phase, in this shape:
 
 ## Decisions
 
-### Decision: one key per bucket, not one shared key
-The location rule forces two keys anyway. It also means a compromise or
-disablement of one key affects one region only, and each key's audit log maps
-to one bucket.
+1. **One key per bucket, not one shared key**
 
-### Decision: `kms.tf` separate from `main.tf`
-The brief asks for `terraform/kms.tf`. Keeping keys in their own file also
-makes it obvious in review that key changes are a different risk class from
-bucket changes.
+   The location rule forces two keys anyway. It also means a compromise or disablement of one key affects one region only, and each key's audit log maps to one bucket.
 
-### Decision: probe object instead of trusting the setting
-A bucket can report a default key while writes still fail or fall back, for
-example if the service agent lacks the key role. Writing a real object and
-reading back `kms_key_name` proves the whole chain: bucket setting, IAM, KMS
-and the enforcement config together.
+2. **`kms.tf` separate from `main.tf`**
 
-### Decision: no key access for human users
-No human, including me, is granted `cryptoKeyEncrypterDecrypter`. Key
-administration (rotation, disabling) is done through Terraform. In this lab one
-person is project owner and could grant themselves the role, so the separation
-is by convention. In production, key administrators and key users would be
-separate identities, ideally with the keys in a dedicated KMS project.
+   The brief asks for `terraform/kms.tf`. Keeping keys in their own file also makes it obvious in review that key changes are a different risk class from bucket changes.
+
+3. **Probe object instead of trusting the setting**
+
+   A bucket can report a default key while writes still fail or fall back, for example if the service agent lacks the key role. Writing a real object and reading back `kms_key_name` proves the whole chain: bucket setting, IAM, KMS and the enforcement config together.
+
+4. **No key access for human users**
+
+   No human, including me, is granted `cryptoKeyEncrypterDecrypter`. Key administration (rotation, disabling) is done through Terraform. In this lab one person is project owner and could grant themselves the role, so the separation is by convention. In production, key administrators and key users would be separate identities, ideally with the keys in a dedicated KMS project.
