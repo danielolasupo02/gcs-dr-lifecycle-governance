@@ -1,0 +1,60 @@
+# promtool unit tests for alert_rules.yml. No cloud and no running stack needed:
+#   docker run --rm -v "$PWD/prometheus:/rules" --entrypoint promtool prom/prometheus:v2.55.1 \
+#     test rules /rules/alert_rules_test.yml
+rule_files:
+  - alert_rules.yml
+
+evaluation_interval: 15s
+
+tests:
+  - name: cost below threshold does not alert
+    interval: 15s
+    input_series:
+      - series: 'gcs_estimated_monthly_storage_cost_usd_total{job="gcs-cost-exporter",instance="exporter:9101"}'
+        values: "0.5x20"
+      - series: 'gcs_cost_threshold_usd{job="gcs-cost-exporter",instance="exporter:9101"}'
+        values: "10x20"
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: GCSStorageCostAboveThreshold
+        exp_alerts: []
+
+  - name: cost above threshold alerts only after the for duration
+    interval: 15s
+    input_series:
+      - series: 'gcs_estimated_monthly_storage_cost_usd_total{job="gcs-cost-exporter",instance="exporter:9101"}'
+        values: "12x20"
+      - series: 'gcs_cost_threshold_usd{job="gcs-cost-exporter",instance="exporter:9101"}'
+        values: "10x20"
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: GCSStorageCostAboveThreshold
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: GCSStorageCostAboveThreshold
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: sre
+              job: gcs-cost-exporter
+              instance: exporter:9101
+            exp_annotations:
+              summary: "Archive storage estimated at $12.00000000/month, above the threshold"
+              description: "Estimated monthly storage cost of the archive buckets has been above gcs_cost_threshold_usd for 1 minute. Check gcs_estimated_monthly_storage_cost_usd by bucket and storage_class."
+
+  - name: exporter down alerts
+    interval: 15s
+    input_series:
+      - series: 'up{job="gcs-cost-exporter",instance="exporter:9101"}'
+        values: "1 1 0x20"
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: GCSCostExporterDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              job: gcs-cost-exporter
+              instance: exporter:9101
+            exp_annotations:
+              summary: "GCS cost exporter is down; storage cost is not being watched"

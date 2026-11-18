@@ -1,0 +1,39 @@
+# GCS storage cost alerting: exporter -> Prometheus -> Alertmanager -> webhook receiver.
+# Start with ../start_stack.sh, which writes .env from Terraform outputs.
+services:
+  exporter:
+    build: ./exporter
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"  # same user as the ADC file owner, so it can read it
+    environment:
+      PROJECT_ID: ${PROJECT_ID}
+      BUCKETS: ${BUCKETS}
+      IMPERSONATE_SA: ${IMPERSONATE_SA}
+      COST_THRESHOLD_USD: ${COST_THRESHOLD_USD:-10}
+      COLLECT_INTERVAL_S: ${COLLECT_INTERVAL_S:-120}
+      GOOGLE_APPLICATION_CREDENTIALS: /creds/adc.json
+    volumes:
+      - ${ADC_FILE}:/creds/adc.json:ro
+    ports: ["127.0.0.1:9101:9101"]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+    ports: ["9090:9090"]
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    volumes:
+      - ./alertmanager:/etc/alertmanager:ro
+    ports: ["9093:9093"]
+    restart: unless-stopped
+
+  receiver:
+    image: python:3.12-slim
+    command: ["python", "-u", "/app/receiver.py"]
+    volumes:
+      - ./receiver:/app:ro
+      - ./data:/data
+    restart: unless-stopped

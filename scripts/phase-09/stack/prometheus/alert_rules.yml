@@ -1,0 +1,33 @@
+groups:
+  - name: gcs-archive-cost
+    rules:
+      # The threshold is a metric from the exporter (COST_THRESHOLD_USD), so it can change
+      # without editing rules. Both series carry the same job/instance labels, so they match.
+      - alert: GCSStorageCostAboveThreshold
+        expr: gcs_estimated_monthly_storage_cost_usd_total > gcs_cost_threshold_usd
+        for: 1m   # lab value; 1h in production to ride out a large one-off upload
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Archive storage estimated at ${{ $value | printf \"%.8f\" }}/month, above the threshold"
+          description: "Estimated monthly storage cost of the archive buckets has been above gcs_cost_threshold_usd for 1 minute. Check gcs_estimated_monthly_storage_cost_usd by bucket and storage_class."
+
+      # Without these two, a broken exporter would silently mean "no cost alerts ever".
+      - alert: GCSCostExporterDown
+        expr: up{job="gcs-cost-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "GCS cost exporter is down; storage cost is not being watched"
+
+      - alert: GCSCostDataStale
+        expr: time() - gcs_cost_exporter_last_success_timestamp_seconds > 900
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "GCS cost exporter has not collected successfully for over 15 minutes"
